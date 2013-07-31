@@ -55,7 +55,7 @@ void logprintf(int prio, const char *format_str, ...) {
 		return;
 
 	if(loglevel >= prio) {
-		if(lf == NULL) {
+		if(lf == NULL && filelog > 0) {
 			if((lf = fopen(logfile, "a+")) == NULL) {
 				logprintf(LOG_WARNING, "could not open logfile %s", logfile);
 			} else {
@@ -69,20 +69,23 @@ void logprintf(int prio, const char *format_str, ...) {
 		current=time(&current);
 		currents=ctime(&current);
 
-		if(filelog == 0 && lf != NULL && loglevel < LOG_DEBUG) {
-			fprintf(lf,"[%15.15s] %s: ",currents+4, progname);
+		if(shelllog == 1) {
+			fprintf(stderr, "[%15.15s] %s: ",currents+4, progname);
 			va_start(ap, format_str);
+
 			if(prio==LOG_WARNING)
-				fprintf(lf,"WARNING: ");
+				fprintf(stderr, "WARNING: ");
 			if(prio==LOG_ERR)
-				fprintf(lf,"ERROR: ");
+				fprintf(stderr, "ERROR: ");
 			if(prio==LOG_INFO)
-				fprintf(lf, "INFO: ");
+				fprintf(stderr, "INFO: ");
 			if(prio==LOG_NOTICE)
-				fprintf(lf, "NOTICE: ");
-			vfprintf(lf, format_str, ap);
-			fputc('\n',lf);
-			fflush(lf);
+				fprintf(stderr, "NOTICE: ");
+			if(prio==LOG_DEBUG)
+				fprintf(stderr, "DEBUG: ");
+			vfprintf(stderr, format_str, ap);
+			fputc('\n',stderr);
+			fflush(stderr);
 			va_end(ap);
 		}
 	}

@@ -196,11 +196,12 @@ int main(int argc, char **argv) {
 									goto close;
 								}
 							}
-							
+
 							json_append_member(json, "message", json_mkstring("send"));
 							json_append_member(json, "code", code);
 
 							socket_write(sockfd, json_stringify(json, NULL));
+
 						} else {
 							logprintf(LOG_ERR, "the device \"%s\" does not exist", device);
 							goto close;

@@ -204,7 +204,7 @@ int getOptions(struct options_t **opt, int argc, char **argv, int error_check) {
 			   Store the argument to check later if it's a long argument */
 			longarg=strdup(argv[getOptPos]);
 		}
-
+		
 		/* A short argument only contains of two characters.
 		   So only store the first two characters */
 		memcpy(shortarg, &argv[getOptPos][0], 2);

@@ -189,12 +189,12 @@ int inet_pton(int af, const char *src, char *dst) {
 int connect_to_server(char *address, unsigned short port) {
 	struct sockaddr_in serv_addr;
 	int sockfd;
-
+	int optval = 0;
 	WSADATA wsaData;
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
+	WSAStartup(MAKEWORD(2, 1), &wsaData);
 	
 	/* Try to open a new socket */
-    if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if((sockfd = socket(AF_INET, SOCK_STREAM, NULL)) < 0) {
         logprintf(LOG_ERR, "could not create socket");
 		return -1;
     }
@@ -210,6 +210,7 @@ int connect_to_server(char *address, unsigned short port) {
     if(connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
 		return -1;
     } else {
+		getsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (char *)&optval, sizeof(int));
 		return sockfd;
 	}
 }
@@ -223,8 +224,7 @@ void socket_close(int sockfd) {
 	if(sockfd > 0) {
 		getpeername(sockfd, (struct sockaddr*)&address, &addrlen);
 		shutdown(sockfd, SHUT_WR);
-		close(sockfd);
-		usleep(250);
+		closesocket(sockfd);
 		WSACleanup();
 		logprintf(LOG_INFO, "client disconnected, ip %s, port %d", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 	}
