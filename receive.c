@@ -101,21 +101,20 @@ int main(int argc, char **argv) {
 	}
 
 	while(1) {
-
-		/* Clear the receive buffer again and read the welcome message */
-		if((recvBuff = socket_read(sockfd)) != NULL) {
-			json = json_decode(recvBuff);
-			json_find_string(json, "message", &message);
-		} else {
-			goto close;
+		if(steps > WELCOME) {
+			/* Clear the receive buffer again and read the welcome message */
+			if((recvBuff = socket_read(sockfd)) != NULL) {
+				json = json_decode(recvBuff);
+				json_find_string(json, "message", &message);
+			} else {
+				goto close;
+			}
+			usleep(250);
 		}
-		usleep(250);
 		switch(steps) {
 			case WELCOME:
-				if(strcmp(message, "accept connection") == 0) {
-					socket_write(sockfd, "{\"message\":\"client receiver\"}");
-					steps=IDENTIFY;
-				}
+				socket_write(sockfd, "{\"message\":\"client receiver\"}");
+				steps=IDENTIFY;
 			break;
 			case IDENTIFY:
 				if(strcmp(message, "accept client") == 0) {
